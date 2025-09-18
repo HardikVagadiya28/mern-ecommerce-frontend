@@ -9,7 +9,8 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const { id } = useParams();
   // const url = "http://localhost:3000/api";
-  const url = "https://mern-ecommerce-backend-ejje.onrender.com/api";
+  // const url = "https://mern-ecommerce-backend-ejje.onrender.com/api";
+  const url = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const { addToCart } = useContext(AppContext);
 

@@ -6,7 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 const AppState = (props) => {
   // const url = "http://localhost:3000/api";
-  const url = "https://mern-ecommerce-backend-ejje.onrender.com/api";
+  // const url = "https://mern-ecommerce-backend-ejje.onrender.com/api";
+  const url = import.meta.env.VITE_API_URL;
 
   const [products, setProducts] = useState([]);
   const [token, setToken] = useState([]);
