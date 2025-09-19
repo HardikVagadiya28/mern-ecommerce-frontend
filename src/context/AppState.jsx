@@ -66,7 +66,7 @@ const AppState = (props) => {
         headers: {
           "Content-Type": "Application/json",
         },
-        withCredentials: true,
+        withCredentials: false,
       }
     );
     // alert(api.data.message)
