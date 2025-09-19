@@ -21,7 +21,7 @@ const ProductDetail = () => {
           headers: {
             "Content-Type": "Application/json",
           },
-          withCredentials: true,
+          withCredentials: false,
         });
         setProduct(api.data.product);
       } catch (error) {
