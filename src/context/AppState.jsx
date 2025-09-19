@@ -25,7 +25,7 @@ const AppState = (props) => {
         headers: {
           "Content-Type": "Application/json",
         },
-        withCredentials: true,
+        withCredentials: false,
       });
       console.log(api.data.products);
       setProducts(api.data.products);
