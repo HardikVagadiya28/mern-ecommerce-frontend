@@ -96,7 +96,7 @@ const AppState = (props) => {
           headers: {
             "Content-Type": "Application/json",
           },
-          withCredentials: true,
+          withCredentials: false,
         }
       );
 
@@ -174,7 +174,7 @@ const AppState = (props) => {
         "Content-Type": "Application/json",
         Auth: token,
       },
-      withCredentials: true,
+      withCredentials: false,
     });
     // console.log("user profile ",api.data);
     setUser(api.data.user);
@@ -191,7 +191,7 @@ const AppState = (props) => {
           "Content-Type": "Application/json",
           Auth: token,
         },
-        withCredentials: true,
+        withCredentials: false,
       }
     );
     setReload(!reload);
@@ -216,7 +216,7 @@ const AppState = (props) => {
         "Content-Type": "Application/json",
         Auth: token,
       },
-      withCredentials: true,
+      withCredentials: false,
     });
     //  console.log("user cart ",api.data.cart);
     setCart(api.data.cart);
@@ -234,7 +234,7 @@ const AppState = (props) => {
             "Content-Type": "Application/json",
             Auth: token,
           },
-          withCredentials: true,
+          withCredentials: false,
         }
       );
       setReload(!reload);
@@ -252,7 +252,7 @@ const AppState = (props) => {
         "Content-Type": "Application/json",
         Auth: token,
       },
-      withCredentials: true,
+      withCredentials: false,
     });
     setReload(!reload);
     // console.log("remove item from cart ",api);
@@ -276,7 +276,7 @@ const AppState = (props) => {
         "Content-Type": "Application/json",
         Auth: token,
       },
-      withCredentials: true,
+      withCredentials: false,
     });
     setReload(!reload);
     // console.log("remove item from cart ",api);
@@ -313,7 +313,7 @@ const AppState = (props) => {
           "Content-Type": "Application/json",
           Auth: token,
         },
-        withCredentials: true,
+        withCredentials: false,
       }
     );
     setReload(!reload);
@@ -339,7 +339,7 @@ const AppState = (props) => {
         "Content-Type": "Application/json",
         Auth: token,
       },
-      withCredentials: true,
+      withCredentials: false,
     });
     //  console.log("user address ", api.data.userAddress);
     setUserAddress(api.data.userAddress);
@@ -352,7 +352,7 @@ const AppState = (props) => {
         "Content-Type": "Application/json",
         Auth: token,
       },
-      withCredentials: true,
+      withCredentials: false,
     });
     //  console.log("user order ", api.data);
     setUserOrder(api.data);
