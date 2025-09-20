@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
-// import AppContext from "../context/AppContext";
+import AppContext from "../context/AppContext";
 
-// Mock context for demonstration
 const AppContext = React.createContext({});
 
 const TableProduct = ({ cart }) => {
