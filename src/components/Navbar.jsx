@@ -5,6 +5,8 @@ import AppContext from "../context/AppContext";
 const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -26,6 +28,23 @@ const Navbar = () => {
     }
   }, [location.pathname, products, activeFilter, setFilteredData]);
 
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setShowMobileSearch(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setIsMobileMenuOpen(false);
+        setShowMobileSearch(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const filterbyCategory = (cat) => {
     setActiveFilter(cat);
 
@@ -34,22 +53,20 @@ const Navbar = () => {
       return;
     }
 
-    console.log("Filtering by category:", cat);
-
     const dbCategories = categoryMap[cat.toLowerCase()] || [cat.toLowerCase()];
-    console.log("Looking for database categories:", dbCategories);
 
     const filteredProducts = products.filter(
       (data) =>
         data.category && dbCategories.includes(data.category.toLowerCase())
     );
 
-    console.log("Filtered products:", filteredProducts);
     setFilteredData(filteredProducts);
 
     if (location.pathname !== "/") {
       navigate("/");
     }
+
+    setIsMobileMenuOpen(false);
   };
 
   const filterbyPrice = (price) => {
@@ -67,6 +84,8 @@ const Navbar = () => {
     if (location.pathname !== "/") {
       navigate("/");
     }
+
+    setIsMobileMenuOpen(false);
   };
 
   const resetFilters = () => {
@@ -76,6 +95,8 @@ const Navbar = () => {
     if (location.pathname !== "/") {
       navigate("/");
     }
+
+    setIsMobileMenuOpen(false);
   };
 
   const submitHandler = (e) => {
@@ -85,6 +106,28 @@ const Navbar = () => {
       setSearchTerm("");
       setActiveFilter("all");
     }
+
+    setIsMobileMenuOpen(false);
+    setShowMobileSearch(false);
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+    if (!isMobileMenuOpen) {
+      setShowMobileSearch(false);
+    }
+  };
+
+  const toggleMobileSearch = () => {
+    setShowMobileSearch(!showMobileSearch);
+    if (!showMobileSearch) {
+      setIsMobileMenuOpen(false);
+    }
+  };
+
+  const closeMobileMenus = () => {
+    setIsMobileMenuOpen(false);
+    setShowMobileSearch(false);
   };
 
   if (!products) {
@@ -95,16 +138,27 @@ const Navbar = () => {
     <>
       <div className="nav sticky-top">
         <div className="nav_bar">
-          <Link
-            to={"/"}
-            className="left"
-            style={{ textDecoration: "none", color: "white" }}
-            onClick={resetFilters}
+          <div className="nav-left">
+            <Link to={"/"} className="logo" onClick={resetFilters}>
+              <h3>ElectroBazar</h3>
+            </Link>
+          </div>
+
+          <button
+            className="mobile-menu-toggle"
+            onClick={toggleMobileMenu}
+            aria-label="Toggle menu"
           >
-            <h3>ElectroBazar</h3>
-          </Link>
-          <form className="search_bar" onSubmit={submitHandler}>
-            <span className="material-symbols-outlined">search</span>{" "}
+            <span className="material-symbols-outlined">
+              {isMobileMenuOpen ? "close" : "menu"}
+            </span>
+          </button>
+
+          <form
+            className={`search_bar ${showMobileSearch ? "mobile-open" : ""}`}
+            onSubmit={submitHandler}
+          >
+            <span className="material-symbols-outlined">search</span>
             <input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -112,36 +166,54 @@ const Navbar = () => {
               placeholder="Search Products..."
             />
           </form>
-          <div className="right">
+
+          <div className={`nav-right ${isMobileMenuOpen ? "mobile-open" : ""}`}>
             {isAuthenticated ? (
               <>
                 <Link
                   to={"/cart"}
                   type="button"
-                  className="btn btn-primary position-relative mx-3"
+                  className="btn btn-primary cart-btn"
+                  onClick={closeMobileMenus}
                 >
                   <span className="material-symbols-outlined">
                     shopping_cart
                   </span>
                   {cart?.items?.length > 0 && (
-                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                      {cart?.items?.length}
-                    </span>
+                    <span className="cart-badge">{cart?.items?.length}</span>
                   )}
                 </Link>
-                <Link to={"/profile"} className="btn btn-info mx-3">
+                <Link
+                  to={"/profile"}
+                  className="btn btn-info"
+                  onClick={closeMobileMenus}
+                >
                   Profile
                 </Link>
-                <button className="btn btn-danger mx-3" onClick={logout}>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => {
+                    logout();
+                    closeMobileMenus();
+                  }}
+                >
                   Logout
                 </button>
               </>
             ) : (
               <>
-                <Link to={"/login"} className="btn btn-secondary mx-3">
+                <Link
+                  to={"/login"}
+                  className="btn btn-secondary"
+                  onClick={closeMobileMenus}
+                >
                   Login
                 </Link>
-                <Link to={"/register"} className="btn btn-info mx-3">
+                <Link
+                  to={"/register"}
+                  className="btn btn-info"
+                  onClick={closeMobileMenus}
+                >
                   Register
                 </Link>
               </>
@@ -149,8 +221,62 @@ const Navbar = () => {
           </div>
         </div>
 
+        <div
+          className={`mobile-auth-row ${isMobileMenuOpen ? "mobile-open" : ""}`}
+        >
+          {isAuthenticated ? (
+            <>
+              <Link
+                to={"/cart"}
+                type="button"
+                className="btn btn-primary cart-btn mobile-btn"
+                onClick={closeMobileMenus}
+              >
+                <span className="material-symbols-outlined">shopping_cart</span>
+                Cart
+                {cart?.items?.length > 0 && (
+                  <span className="cart-badge">{cart?.items?.length}</span>
+                )}
+              </Link>
+              <Link
+                to={"/profile"}
+                className="btn btn-info mobile-btn"
+                onClick={closeMobileMenus}
+              >
+                Profile
+              </Link>
+              <button
+                className="btn btn-danger mobile-btn"
+                onClick={() => {
+                  logout();
+                  closeMobileMenus();
+                }}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to={"/login"}
+                className="btn btn-secondary mobile-btn"
+                onClick={closeMobileMenus}
+              >
+                Login
+              </Link>
+              <Link
+                to={"/register"}
+                className="btn btn-info mobile-btn"
+                onClick={closeMobileMenus}
+              >
+                Register
+              </Link>
+            </>
+          )}
+        </div>
+
         {location.pathname === "/" && (
-          <div className="sub_bar">
+          <div className={`sub_bar ${isMobileMenuOpen ? "mobile-open" : ""}`}>
             <div
               className={`items ${activeFilter === "all" ? "active" : ""}`}
               onClick={resetFilters}
@@ -226,6 +352,21 @@ const Navbar = () => {
           </div>
         )}
       </div>
+
+      {(isMobileMenuOpen || showMobileSearch) && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            zIndex: 500,
+          }}
+          onClick={closeMobileMenus}
+        />
+      )}
     </>
   );
 };
