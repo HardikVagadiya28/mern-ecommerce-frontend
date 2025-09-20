@@ -1,92 +1,212 @@
-import React, { useContext } from "react";
-import { useState } from "react";
+import React, { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Container, Form, Button, Alert } from "react-bootstrap";
 import AppContext from "../../context/AppContext";
-import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const { register } = useContext(AppContext);
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
   });
-  const onChangerHandler = (e) => {
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState({ text: "", type: "" });
+
+  const onChangeHandler = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-  };
-  const { name, email, password } = formData;
-  const submitHandler = async (e) => {
-    e.preventDefault();
-    const result = await register(name, email, password);
 
-    if (result.success) {
-      navigate("/login");
+    if (message.text) {
+      setMessage({ text: "", type: "" });
+    }
+  };
+
+  const { name, email, password } = formData;
+
+  const validateForm = () => {
+    if (!name || !email || !password) {
+      setMessage({ text: "Please fill in all fields", type: "error" });
+      return false;
     }
 
-    // console.log(formData);
+    if (name.length < 2) {
+      setMessage({
+        text: "Name must be at least 2 characters long",
+        type: "error",
+      });
+      return false;
+    }
+
+    if (!email.includes("@")) {
+      setMessage({ text: "Please enter a valid email address", type: "error" });
+      return false;
+    }
+
+    if (password.length < 6) {
+      setMessage({
+        text: "Password must be at least 6 characters long",
+        type: "error",
+      });
+      return false;
+    }
+
+    return true;
   };
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    setMessage({ text: "", type: "" });
+
+    try {
+      const result = await register(name, email, password);
+
+      if (result.success) {
+        setMessage({
+          text: "Registration successful! Redirecting to login...",
+          type: "success",
+        });
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      } else {
+        setMessage({
+          text: result.message || "Registration failed. Please try again.",
+          type: "error",
+        });
+      }
+    } catch (error) {
+      setMessage({
+        text: "An error occurred. Please try again.",
+        type: "error",
+      });
+      console.error("Registration error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <>
+    <Container className="d-flex justify-content-center align-items-center min-vh-100 py-2">
       <div
-        className="container my-5 p-4"
+        className="register-container"
         style={{
           width: "600px",
           border: "2px solid yellow",
           borderRadius: "10px",
+          padding: "2rem",
+          background: "#1a1a1a",
         }}
       >
-        <h1 className="text-center">User Register</h1>
-        <form onSubmit={submitHandler} className="my-3">
-          <div className="mb-3">
-            <label htmlFor="exampleInputEmail1" className="form-label">
-              Name
-            </label>
-            <input
+        <h1 className="register-title text-center text-white mb-4">Register</h1>
+
+        {message.text && (
+          <Alert
+            variant={message.type === "error" ? "danger" : "success"}
+            className="register-message text-center"
+          >
+            {message.text}
+          </Alert>
+        )}
+
+        <Form onSubmit={submitHandler} className="register-form">
+          <Form.Group className="register-form-group mb-3">
+            <Form.Label className="text-white fw-bold">Full Name</Form.Label>
+            <Form.Control
               name="name"
-              value={formData.name}
-              onChange={onChangerHandler}
               type="text"
-              className="form-control"
-              id="exampleInputEmail13"
-              aria-describedby="emailHelp"
+              value={formData.name}
+              onChange={onChangeHandler}
+              placeholder="Enter your full name"
+              required
+              disabled={isLoading}
+              style={{
+                backgroundColor: "#2a2a2a",
+                borderColor: "#444",
+                color: "#fff",
+              }}
             />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="exampleInputEmail1" className="form-label">
-              Email
-            </label>
-            <input
+          </Form.Group>
+
+          <Form.Group className="register-form-group mb-3">
+            <Form.Label className="text-white fw-bold">
+              Email Address
+            </Form.Label>
+            <Form.Control
               name="email"
-              value={formData.email}
-              onChange={onChangerHandler}
               type="email"
-              className="form-control"
-              id="exampleInputEmail1"
-              aria-describedby="emailHelp"
+              value={formData.email}
+              onChange={onChangeHandler}
+              placeholder="Enter your email address"
+              required
+              disabled={isLoading}
+              style={{
+                backgroundColor: "#2a2a2a",
+                borderColor: "#444",
+                color: "#fff",
+              }}
             />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="exampleInputPassword1" className="form-label">
-              Password
-            </label>
-            <input
+          </Form.Group>
+
+          <Form.Group className="register-form-group mb-3">
+            <Form.Label className="text-white fw-bold">Password</Form.Label>
+            <Form.Control
               name="password"
-              value={formData.password}
-              onChange={onChangerHandler}
               type="password"
-              className="form-control"
-              id="exampleInputPassword1"
+              value={formData.password}
+              onChange={onChangeHandler}
+              placeholder="Enter your password"
+              required
+              disabled={isLoading}
+              style={{
+                backgroundColor: "#2a2a2a",
+                borderColor: "#444",
+                color: "#fff",
+              }}
             />
+          </Form.Group>
+
+          <div className="register-button-wrapper d-grid col-6 mx-auto my-3">
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <span className="register-loading">
+                  <span className="register-spinner"></span>
+                  Registering...
+                </span>
+              ) : (
+                "Register"
+              )}
+            </Button>
           </div>
-          <div className="d-grid col-6 mx-auto my-3">
-            <button type="submit" className="btn btn-primary">
-              Register
-            </button>
-          </div>
-        </form>
+        </Form>
+
+        <div className="register-footer text-center mt-3">
+          <p className="text-light mb-0">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="text-warning fw-bold text-decoration-none"
+            >
+              Login here
+            </Link>
+          </p>
+        </div>
       </div>
-    </>
+    </Container>
   );
 };
 
