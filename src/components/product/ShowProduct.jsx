@@ -1,67 +1,86 @@
 import React, { useContext } from "react";
-import AppContext from "../../context/AppContext";
 import { Link } from "react-router-dom";
+import AppContext from "../../context/AppContext";
 
 const ShowProduct = () => {
   const { products, filteredData, addToCart } = useContext(AppContext);
+
+  const handleAddToCart = (product) => {
+    if (addToCart && product) {
+      addToCart(
+        product._id,
+        product.title,
+        product.price,
+        1, // Default quantity
+        product.imgSrc
+      );
+    }
+  };
+
+  // Loading state
+  if (!products) {
+    return (
+      <div className="show-products-loading">
+        <div className="show-loading-spinner"></div>
+        <p>Loading products...</p>
+      </div>
+    );
+  }
+
+  // No products state
+  if (!filteredData || filteredData.length === 0) {
+    return (
+      <div className="show-product-container">
+        <div className="show-no-products">
+          <div className="show-no-products-icon">📦</div>
+          <h3>No Products Found</h3>
+          <p>We couldn't find any products matching your current filters.</p>
+          <Link to="/" className="browse-categories-btn">
+            Browse All Categories
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <>
-      <div className="container  d-flex justify-content-center align-items-center">
-        <div className="row container d-flex justify-content-center align-items-center my-5">
-          {filteredData?.map((product) => (
-            <div
-              key={product._id}
-              className="my-3 col-md-4
-            d-flex justify-content-center align-items-center"
-            >
-              <div
-                className="card bg-dark text-light text-center"
-                style={{ width: "18rem" }}
+    <div className="show-product-container">
+      <div className="container d-flex justify-content-center align-items-center">
+        <div className="show-products-grid">
+          {filteredData.map((product) => (
+            <div key={product._id} className="show-product-card">
+              <Link
+                to={`/product/${product._id}`}
+                className="show-product-link"
               >
-                <Link
-                  to={`/product/${product._id}`}
-                  className="d-flex justify-content-center align-items-center p-3"
-                >
-                  <img
-                    src={product.imgSrc}
-                    className="card-img-top"
-                    alt="..."
-                    style={{
-                      width: "200px",
-                      height: "200px",
-                      borderRadius: "10px",
-                      border: "2px solid yellow",
-                    }}
-                  />
-                </Link>
-                <div className="card-body">
-                  <h5 className="card-title">{product.title}</h5>
-                  <div className="my-3">
-                    <button className="btn btn-primary mx-3">
-                      {product.price} {"₹"}
-                    </button>
-                    <button
-                      className="btn btn-warning"
-                      onClick={() =>
-                        addToCart(
-                          product._id,
-                          product.title,
-                          product.price,
-                          1,
-                          product.imgSrc
-                        )
-                      }
-                    >
-                      Add To Cart
-                    </button>
-                  </div>
+                <img
+                  src={product.imgSrc}
+                  className="show-product-image"
+                  alt={product.title}
+                  loading="lazy"
+                />
+              </Link>
+
+              <div className="show-product-info">
+                <h5 className="show-product-title-text">{product.title}</h5>
+
+                <div className="show-product-actions">
+                  <button className="show-product-price">
+                    ₹{product.price}
+                  </button>
+                  <button
+                    className="show-product-cart-btn"
+                    onClick={() => handleAddToCart(product)}
+                  >
+                    Add To Cart
+                  </button>
                 </div>
               </div>
             </div>
           ))}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
