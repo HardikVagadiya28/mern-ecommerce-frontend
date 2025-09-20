@@ -1,67 +1,90 @@
-import React, { useContext, useState } from "react";
-import AppContext from "../../context/AppContext";
-import { useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import AppContext from "../../context/AppContext";
 
 const RelatedProduct = ({ category }) => {
-  const { products } = useContext(AppContext);
-  const [realtedProduct, setRealtedProduct] = useState([]);
+  const { products, addToCart } = useContext(AppContext);
+  const [relatedProduct, setRelatedProduct] = useState([]);
+
   useEffect(() => {
-    setRealtedProduct(
-      products.filter(
-        (data) => data?.category?.toLowerCase() == category?.toLowerCase()
-      )
-    );
+    if (products && category) {
+      const filtered = products.filter(
+        (data) =>
+          data?.category?.toLowerCase() === category?.toLowerCase() && data._id 
+      );
+      setRelatedProduct(filtered.slice(0, 6)); 
+    }
   }, [category, products]);
 
+  const handleAddToCart = (product) => {
+    if (addToCart && product) {
+      addToCart(
+        product._id,
+        product.title,
+        product.price,
+        1, 
+        product.imgSrc
+      );
+    }
+  };
+
+  if (!products || products.length === 0) {
+    return (
+      <div className="related-products-loading">
+        Loading related products...
+      </div>
+    );
+  }
+
+  if (!relatedProduct || relatedProduct.length === 0) {
+    return (
+      <div className="related-products-empty">
+        <h3>No Related Products Found</h3>
+        <p>Check back later for similar items</p>
+      </div>
+    );
+  }
+
   return (
-    <>
+    <div className="related-product-container">
       <div className="container text-center">
-        <h1>Related Product</h1>
-        <div className="container  d-flex justify-content-center align-items-center">
-          <div className="row container d-flex justify-content-center align-items-center my-5">
-            {realtedProduct?.map((product) => (
-              <div
-                key={product._id}
-                className="my-3 col-md-4 
-            d-flex justify-content-center align-items-center"
+        <h1 className="related-product-title">Related Products</h1>
+
+        <div className="related-products-grid">
+          {relatedProduct.map((product) => (
+            <div key={product._id} className="related-product-card">
+              <Link
+                to={`/product/${product._id}`}
+                className="related-product-link"
               >
-                <div
-                  className="card bg-dark text-light text-center"
-                  style={{ width: "18rem" }}
-                >
-                  <Link
-                    to={`/product/${product._id}`}
-                    className="d-flex justify-content-center align-items-center p-3"
+                <img
+                  src={product.imgSrc}
+                  className="related-product-image"
+                  alt={product.title}
+                  loading="lazy"
+                />
+              </Link>
+
+              <div className="related-product-info">
+                <h5 className="related-product-title-text">{product.title}</h5>
+
+                <div className="related-product-actions">
+                  <button className="related-product-price">
+                    ₹{product.price}
+                  </button>
+                  <button
+                    className="related-product-cart-btn"
+                    onClick={() => handleAddToCart(product)}
                   >
-                    <img
-                      src={product.imgSrc}
-                      className="card-img-top"
-                      alt="..."
-                      style={{
-                        width: "200px",
-                        height: "200px",
-                        borderRadius: "10px",
-                        border: "2px solid yellow",
-                      }}
-                    />
-                  </Link>
-                  <div className="card-body">
-                    <h5 className="card-title">{product.title}</h5>
-                    <div className="my-3">
-                      <button className="btn btn-primary mx-3">
-                        {product.price} {"₹"}
-                      </button>
-                      <button className="btn btn-warning">Add To Cart</button>
-                    </div>
-                  </div>
+                    Add To Cart
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
