@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { Container, Row, Col, Card, Button, Badge } from "react-bootstrap";
 import AppContext from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 
@@ -24,55 +25,59 @@ const Cart = () => {
   }, [cart]);
 
   return (
-    <>
-      <div className="container my-4">
-        <h1 className="text-center mb-4" style={{ color: "#ffc107" }}>
-          Shopping Cart
-        </h1>
+    <Container className="my-4">
+      <h1 className="text-center mb-4" style={{ color: "#ffc107" }}>
+        Shopping Cart
+      </h1>
 
-        {cart?.items?.length === 0 ? (
-          <div className="text-center py-5">
-            <div
-              className="empty-cart-icon"
-              style={{ fontSize: "4rem", color: "#6c757d" }}
-            >
-              <span className="material-symbols-outlined">shopping_cart</span>
-            </div>
-            <h3 className="my-3">Your cart is empty</h3>
-            <p className="text-muted mb-4">Add some products to get started</p>
-            <button
-              className="btn btn-warning btn-lg"
-              style={{ fontWeight: "bold" }}
-              onClick={() => navigate("/")}
-            >
-              Continue Shopping
-            </button>
+      {cart?.items?.length === 0 ? (
+        <div className="text-center py-5">
+          <div
+            className="empty-cart-icon"
+            style={{ fontSize: "4rem", color: "#6c757d" }}
+          >
+            <span className="material-symbols-outlined">shopping_cart</span>
           </div>
-        ) : (
-          <>
-            {/* Cart Summary */}
-            <div className="cart-summary card bg-dark text-light mb-4">
-              <div className="card-body d-flex justify-content-between align-items-center">
-                <div>
-                  <h5 className="mb-0">Cart Summary</h5>
-                </div>
-                <div className="d-flex gap-3">
-                  <span className="badge bg-info fs-6">Items: {qty}</span>
-                  <span className="badge bg-warning text-dark fs-6">
-                    Total: ₹{price.toLocaleString()}
-                  </span>
-                </div>
+          <h3 className="my-3">Your cart is empty</h3>
+          <p className="text-muted mb-4">Add some products to get started</p>
+          <Button
+            variant="warning"
+            size="lg"
+            style={{ fontWeight: "bold" }}
+            onClick={() => navigate("/")}
+          >
+            Continue Shopping
+          </Button>
+        </div>
+      ) : (
+        <>
+        
+          <Card className="bg-dark text-light mb-4">
+            <Card.Body className="d-flex flex-column flex-md-row justify-content-between align-items-center py-3">
+              <h5 className="mb-2 mb-md-0">Cart Summary</h5>
+              <div className="d-flex gap-2 gap-md-3">
+                <Badge bg="info" className="fs-6 py-2">
+                  Items: {qty}
+                </Badge>
+                <Badge bg="warning" text="dark" className="fs-6 py-2">
+                  Total: ₹{price.toLocaleString()}
+                </Badge>
               </div>
-            </div>
+            </Card.Body>
+          </Card>
 
-            {/* Cart Items */}
-            <div className="cart-items">
-              {cart?.items?.map((product) => (
-                <div key={product._id} className="card bg-dark text-light mb-3">
-                  <div className="card-body">
-                    <div className="row align-items-center">
-                      {/* Product Image */}
-                      <div className="col-md-2">
+          <div className="cart-items">
+            {cart?.items?.map((product) => (
+              <Card key={product._id} className="bg-dark text-light mb-3">
+                <Card.Body className="p-3">
+                  <Row className="align-items-center">
+                 
+                    <Col
+                      xs={12}
+                      md={2}
+                      className="order-1 order-md-1 mb-3 mb-md-0"
+                    >
+                      <div className="d-flex justify-content-center">
                         <img
                           src={product.imgSrc}
                           alt={product.title}
@@ -89,52 +94,76 @@ const Cart = () => {
                           }}
                         />
                       </div>
+                    </Col>
 
-                      {/* Product Details */}
-                      <div className="col-md-4">
-                        <h6 className="card-title text-warning">
-                          {product.title}
-                        </h6>
-                        <p className="mb-1 text-muted">
-                          Unit Price: ₹{product.price / product.qty}
-                        </p>
+                    <Col
+                      xs={12}
+                      md={4}
+                      className="order-3 order-md-2 mb-2 mb-md-0"
+                    >
+                      <h6 className="card-title text-warning mb-1">
+                        {product.title}
+                      </h6>
+                      <p className="mb-1 text-muted">
+                        Unit Price: ₹
+                        {(product.price / product.qty).toLocaleString()}
+                      </p>
+                      <div className="d-md-none mt-2">
+                        <span className="fw-bold fs-5">
+                          ₹{product.price.toLocaleString()}
+                        </span>
                       </div>
+                    </Col>
 
-                      {/* Quantity Controls */}
-                      <div className="col-md-3">
-                        <div className="d-flex align-items-center">
-                          <button
-                            className="btn btn-outline-warning btn-sm"
-                            onClick={() => decreaseQty(product?.productId, 1)}
-                            disabled={product.qty <= 1}
-                          >
-                            -
-                          </button>
-                          <span className="mx-3 fw-bold">{product.qty}</span>
-                          <button
-                            className="btn btn-outline-warning btn-sm"
-                            onClick={() =>
-                              addToCart(
-                                product?.productId,
-                                product.title,
-                                product.price / product.qty,
-                                1,
-                                product.imgSrc
-                              )
-                            }
-                          >
-                            +
-                          </button>
-                        </div>
+                   <Col
+                      xs={12}
+                      md={3}
+                      className="order-4 order-md-3 mb-3 mb-md-0"
+                    >
+                      <div className="d-flex align-items-center justify-content-center justify-content-md-start">
+                        <Button
+                          variant="outline-warning"
+                          size="sm"
+                          onClick={() => decreaseQty(product?.productId, 1)}
+                          disabled={product.qty <= 1}
+                          className="px-3"
+                        >
+                          -
+                        </Button>
+                        <span className="mx-3 fw-bold">{product.qty}</span>
+                        <Button
+                          variant="outline-warning"
+                          size="sm"
+                          onClick={() =>
+                            addToCart(
+                              product?.productId,
+                              product.title,
+                              product.price / product.qty,
+                              1,
+                              product.imgSrc
+                            )
+                          }
+                          className="px-3"
+                        >
+                          +
+                        </Button>
                       </div>
+                    </Col>
 
-                      {/* Price and Actions */}
-                      <div className="col-md-3 text-end">
-                        <div className="mb-2">
-                          <span className="fw-bold fs-5">₹{product.price}</span>
-                        </div>
-                        <button
-                          className="btn btn-outline-danger btn-sm"
+                    <Col
+                      xs={12}
+                      md={3}
+                      className="order-2 order-md-4 text-md-end"
+                    >
+                      <div className="d-none d-md-block mb-2">
+                        <span className="fw-bold fs-5">
+                          ₹{product.price.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="d-flex justify-content-center justify-content-md-end gap-2">
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
                           onClick={() => {
                             if (
                               confirm(
@@ -146,53 +175,53 @@ const Cart = () => {
                           }}
                         >
                           Remove
-                        </button>
+                        </Button>
                       </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                    </Col>
+                  </Row>
+                </Card.Body>
+              </Card>
+            ))}
+          </div>
 
-            {/* Cart Actions */}
-            <div className="cart-actions mt-4">
-              <div className="row">
-                <div className="col-md-6">
-                  <button
-                    className="btn btn-outline-light w-100"
-                    onClick={() => navigate("/")}
+          <div className="cart-actions mt-4">
+            <Row>
+              <Col md={6} className="mb-3 mb-md-0">
+                <Button
+                  variant="outline-light"
+                  className="w-100"
+                  onClick={() => navigate("/")}
+                >
+                  Continue Shopping
+                </Button>
+              </Col>
+              <Col md={6}>
+                <div className="d-grid gap-2">
+                  <Button
+                    variant="warning"
+                    onClick={() => navigate("/shipping")}
                   >
-                    Continue Shopping
-                  </button>
+                    Proceed to Checkout
+                  </Button>
+                  <Button
+                    variant="outline-danger"
+                    onClick={() => {
+                      if (
+                        confirm("Are you sure you want to clear your cart?")
+                      ) {
+                        clearCart();
+                      }
+                    }}
+                  >
+                    Clear Cart
+                  </Button>
                 </div>
-                <div className="col-md-6">
-                  <div className="d-grid gap-2">
-                    <button
-                      className="btn btn-warning"
-                      onClick={() => navigate("/shipping")}
-                    >
-                      Proceed to Checkout
-                    </button>
-                    <button
-                      className="btn btn-outline-danger"
-                      onClick={() => {
-                        if (
-                          confirm("Are you sure you want to clear your cart?")
-                        ) {
-                          clearCart();
-                        }
-                      }}
-                    >
-                      Clear Cart
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-    </>
+              </Col>
+            </Row>
+          </div>
+        </>
+      )}
+    </Container>
   );
 };
 
